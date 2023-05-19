@@ -1,8 +1,6 @@
 #ifndef PM_IMGUI_HELPER_H
 #define PM_IMGUI_HELPER_H
 
-#include <string>
-
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
@@ -35,9 +33,9 @@ namespace pm {
         SDL_Quit();
     }
 
-    void CreateWindow(std::string title, int width, int height) {
+    void CreateWindow(const char* title, int width, int height) {
         SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-        window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                   width, height, window_flags);
 
         gl_context = SDL_GL_CreateContext(window);

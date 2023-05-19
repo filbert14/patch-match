@@ -1,7 +1,5 @@
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 #include "imgui_helper.h"
+#include "stb_image_helper.h"
 
 int main() {
     pm::Initialize();
@@ -11,8 +9,13 @@ int main() {
     pm::CreateWindow("pmgui", display_mode.w, display_mode.h);
 
     // Load JPG image using stb_image
-    int image_width, image_height, image_channels;
-    unsigned char* image_data = stbi_load("image.jpg", &image_width, &image_height, &image_channels, 0);
+    pm::Image image;
+    pm::LoadImageRGB("image.jpg", image);
+
+    int image_width = image.image_width;
+    int image_height = image.image_height;
+    int image_channels = image.image_channels;
+    unsigned char* image_data = image.image_data;
 
     // Create OpenGL texture
     GLuint texture_id;
@@ -36,7 +39,7 @@ int main() {
     }
 
     // Cleanup
-    stbi_image_free(image_data);
+    pm::FreeImage(image);
 
     pm::DestroyWindow();
     pm::Terminate();
