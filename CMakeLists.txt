@@ -10,6 +10,9 @@ target_link_libraries(pm PUBLIC DearImGui)
 add_executable(pmgui src/pmgui.cpp)
 target_link_libraries(pmgui PUBLIC pm)
 
+### stb_image
+target_include_directories(pm PUBLIC lib/stb_image)
+
 ### Dear ImGui
 add_library(DearImGui STATIC)
 find_package(SDL2 REQUIRED)
