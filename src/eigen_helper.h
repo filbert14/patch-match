@@ -10,13 +10,13 @@ namespace pm {
     namespace rgb_8 {
 
         typedef Eigen::Matrix<unsigned char, 3, 1> Pixel;
-        typedef Eigen::Matrix <Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
+        typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
 
         ImageMatrix GetImageMatrix(Image& image) {
             ImageMatrix image_matrix;
             image_matrix.resize(image.image_height, image.image_width);
 
-            for (int p = 0; p < image.image_width * image.image_height * 3; p += 3) {
+            for(int p = 0; p < image.image_width * image.image_height * 3; p += 3) {
                 unsigned char r = *(image.image_data + p);
                 unsigned char g = *(image.image_data + (p + 1));
                 unsigned char b = *(image.image_data + (p + 2));
@@ -31,9 +31,9 @@ namespace pm {
         }
 
         Image GetImage(ImageMatrix& image_matrix) {
-            unsigned char *image_data = new unsigned char[image_matrix.rows() * image_matrix.cols() * 3];
+            unsigned char* image_data = new unsigned char[image_matrix.rows() * image_matrix.cols() * 3];
 
-            for (int p = 0; p < image_matrix.rows() * image_matrix.cols() * 3; p += 3) {
+            for(int p = 0; p < image_matrix.rows() * image_matrix.cols() * 3; p += 3) {
                 int i = p / (image_matrix.cols() * 3);
                 int j = p % (image_matrix.cols());
 
@@ -42,7 +42,7 @@ namespace pm {
                 *(image_data + (p + 2)) = image_matrix(i, j)[2];
             }
 
-            Image image{image_matrix.cols(), image_matrix.rows(), 3, image_data};
+            Image image{static_cast<int>(image_matrix.cols()), static_cast<int>(image_matrix.rows()), 3, image_data};
             return image;
         }
 

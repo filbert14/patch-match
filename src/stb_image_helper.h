@@ -11,8 +11,8 @@ namespace pm {
     namespace rgb_8 {
 
         struct Image {
-            long image_width;
-            long image_height;
+            int image_width;
+            int image_height;
             int image_channels;
             unsigned char* image_data;
         };
