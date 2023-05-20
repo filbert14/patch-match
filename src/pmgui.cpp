@@ -14,6 +14,8 @@ int main() {
     pm::LoadImageRGB8("image.jpg", image);
 
     pm::ImageMatrix image_matrix = pm::ImageDataToMatrixRGB8(image);
+    pm::FreeImage(image);
+
     image = pm::ImageMatrixToDataRGB8(image_matrix);
 
     int image_width = image.image_width;
