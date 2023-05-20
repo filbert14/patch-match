@@ -13,6 +13,11 @@ target_link_libraries(pmgui PUBLIC pm)
 ### stb_image
 target_include_directories(pm PUBLIC lib/stb_image)
 
+### Eigen
+find_package(Eigen3 REQUIRED)
+target_include_directories(pm PUBLIC ${Eigen_INCLUDE_DIRS})
+target_link_libraries(pm PUBLIC ${Eigen_LIBRARIES})
+
 ### Dear ImGui
 add_library(DearImGui STATIC)
 find_package(SDL2 REQUIRED)

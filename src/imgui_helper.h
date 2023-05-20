@@ -7,10 +7,9 @@
 #include "SDL2/SDL.h"
 #include <SDL_opengl.h>
 
-namespace pm {
+#include "pm.h"
 
-    SDL_Window* window = nullptr;
-    SDL_GLContext gl_context = nullptr;
+namespace pm {
 
     void Initialize() {
         // @TODO: Do a check here if an SDL subsystem failed to initialize
