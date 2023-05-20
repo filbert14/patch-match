@@ -13,10 +13,10 @@ int main() {
     pm::ImageRGB8 image;
     pm::LoadImageRGB8("image.jpg", image);
 
-    pm::ImageMatrixRGB8 image_matrix = pm::ImageDataToMatrixRGB8(image);
+    pm::ImageMatrixRGB8 image_matrix = pm::GetImageMatrixRGB8(image);
     pm::FreeImageRGB8(image);
 
-    image = pm::ImageMatrixToDataRGB8(image_matrix);
+    image = pm::GetImageRGB8(image_matrix);
 
     int image_width = image.image_width;
     int image_height = image.image_height;
