@@ -7,11 +7,11 @@
 
 namespace pm {
 
-    typedef Eigen::Matrix<unsigned char, 3, 1> Pixel;
-    typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
+    typedef Eigen::Matrix<unsigned char, 3, 1> PixelRGB8;
+    typedef Eigen::Matrix<PixelRGB8, Eigen::Dynamic, Eigen::Dynamic> ImageMatrixRGB8;
 
-    ImageMatrix ImageDataToMatrixRGB8(Image& image) {
-        ImageMatrix image_matrix;
+    ImageMatrixRGB8 ImageDataToMatrixRGB8(ImageRGB8& image) {
+        ImageMatrixRGB8 image_matrix;
         image_matrix.resize(image.image_height, image.image_width);
 
         for(int p = 0; p < image.image_width * image.image_height * 3; p += 3) {
@@ -22,13 +22,13 @@ namespace pm {
             int i = p / (image.image_width * 3);
             int j = p % (image.image_width);
 
-            image_matrix(i, j) = Pixel {r, g, b};
+            image_matrix(i, j) = PixelRGB8 {r, g, b};
         }
 
         return image_matrix;
     }
 
-    Image ImageMatrixToDataRGB8(ImageMatrix& image_matrix) {
+    ImageRGB8 ImageMatrixToDataRGB8(ImageMatrixRGB8& image_matrix) {
         unsigned char* image_data = new unsigned char[image_matrix.rows() * image_matrix.cols() * 3];
 
         for(int p = 0; p < image_matrix.rows() * image_matrix.cols() * 3; p += 3) {
@@ -40,7 +40,7 @@ namespace pm {
             *(image_data + (p + 2)) = image_matrix(i, j)[2];
         }
 
-        Image image {image_matrix.cols(), image_matrix.rows(), 3, image_data};
+        ImageRGB8 image {image_matrix.cols(), image_matrix.rows(), 3, image_data};
         return image;
     }
 

@@ -10,11 +10,11 @@ int main() {
     pm::CreateWindow("pmgui", display_mode.w, display_mode.h);
 
     // Load JPG image using stb_image
-    pm::Image image;
+    pm::ImageRGB8 image;
     pm::LoadImageRGB8("image.jpg", image);
 
-    pm::ImageMatrix image_matrix = pm::ImageDataToMatrixRGB8(image);
-    pm::FreeImage(image);
+    pm::ImageMatrixRGB8 image_matrix = pm::ImageDataToMatrixRGB8(image);
+    pm::FreeImageRGB8(image);
 
     image = pm::ImageMatrixToDataRGB8(image_matrix);
 
@@ -45,7 +45,7 @@ int main() {
     }
 
     // Cleanup
-    pm::FreeImage(image);
+    pm::FreeImageRGB8(image);
 
     pm::DestroyWindow();
     pm::Terminate();
