@@ -10,13 +10,13 @@ int main() {
     pm::CreateWindow("pmgui", display_mode.w, display_mode.h);
 
     // Load JPG image using stb_image
-    pm::ImageRGB8 image;
-    pm::LoadImageRGB8("image.jpg", image);
+    pm::rgb_8::Image image;
+    pm::rgb_8::LoadImage("image.jpg", image);
 
-    pm::ImageMatrixRGB8 image_matrix = pm::GetImageMatrixRGB8(image);
-    pm::FreeImageRGB8(image);
+    pm::rgb_8::ImageMatrix image_matrix = pm::rgb_8::GetImageMatrix(image);
+    pm::rgb_8::FreeImage(image);
 
-    image = pm::GetImageRGB8(image_matrix);
+    image = pm::rgb_8::GetImage(image_matrix);
 
     int image_width = image.image_width;
     int image_height = image.image_height;
@@ -45,7 +45,7 @@ int main() {
     }
 
     // Cleanup
-    pm::FreeImageRGB8(image);
+    pm::rgb_8::FreeImage(image);
 
     pm::DestroyWindow();
     pm::Terminate();

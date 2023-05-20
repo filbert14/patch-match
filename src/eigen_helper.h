@@ -7,42 +7,46 @@
 
 namespace pm {
 
-    typedef Eigen::Matrix<unsigned char, 3, 1> PixelRGB8;
-    typedef Eigen::Matrix<PixelRGB8, Eigen::Dynamic, Eigen::Dynamic> ImageMatrixRGB8;
+    namespace rgb_8 {
 
-    ImageMatrixRGB8 GetImageMatrixRGB8(ImageRGB8& image) {
-        ImageMatrixRGB8 image_matrix;
-        image_matrix.resize(image.image_height, image.image_width);
+        typedef Eigen::Matrix<unsigned char, 3, 1> Pixel;
+        typedef Eigen::Matrix <Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
 
-        for(int p = 0; p < image.image_width * image.image_height * 3; p += 3) {
-            unsigned char r = *(image.image_data + p);
-            unsigned char g = *(image.image_data + (p + 1));
-            unsigned char b = *(image.image_data + (p + 2));
+        ImageMatrix GetImageMatrix(Image& image) {
+            ImageMatrix image_matrix;
+            image_matrix.resize(image.image_height, image.image_width);
 
-            int i = p / (image.image_width * 3);
-            int j = p % (image.image_width);
+            for (int p = 0; p < image.image_width * image.image_height * 3; p += 3) {
+                unsigned char r = *(image.image_data + p);
+                unsigned char g = *(image.image_data + (p + 1));
+                unsigned char b = *(image.image_data + (p + 2));
 
-            image_matrix(i, j) = PixelRGB8 {r, g, b};
+                int i = p / (image.image_width * 3);
+                int j = p % (image.image_width);
+
+                image_matrix(i, j) = Pixel {r, g, b};
+            }
+
+            return image_matrix;
         }
 
-        return image_matrix;
-    }
+        Image GetImage(ImageMatrix& image_matrix) {
+            unsigned char *image_data = new unsigned char[image_matrix.rows() * image_matrix.cols() * 3];
 
-    ImageRGB8 GetImageRGB8(ImageMatrixRGB8& image_matrix) {
-        unsigned char* image_data = new unsigned char[image_matrix.rows() * image_matrix.cols() * 3];
+            for (int p = 0; p < image_matrix.rows() * image_matrix.cols() * 3; p += 3) {
+                int i = p / (image_matrix.cols() * 3);
+                int j = p % (image_matrix.cols());
 
-        for(int p = 0; p < image_matrix.rows() * image_matrix.cols() * 3; p += 3) {
-            int i = p / (image_matrix.cols() * 3);
-            int j = p % (image_matrix.cols());
+                *(image_data + p) = image_matrix(i, j)[0];
+                *(image_data + (p + 1)) = image_matrix(i, j)[1];
+                *(image_data + (p + 2)) = image_matrix(i, j)[2];
+            }
 
-            *(image_data + p) = image_matrix(i,j)[0];
-            *(image_data + (p + 1)) = image_matrix(i, j)[1];
-            *(image_data + (p + 2)) = image_matrix(i, j)[2];
+            Image image{image_matrix.cols(), image_matrix.rows(), 3, image_data};
+            return image;
         }
 
-        ImageRGB8 image {image_matrix.cols(), image_matrix.rows(), 3, image_data};
-        return image;
-    }
+    } // rgb_8
 
 } // pm
 

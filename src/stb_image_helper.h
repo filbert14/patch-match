@@ -8,30 +8,34 @@
 
 namespace pm {
 
-    struct ImageRGB8 {
-        long image_width;
-        long image_height;
-        int image_channels;
-        unsigned char* image_data;
-    };
+    namespace rgb_8 {
 
-    void LoadImageRGB8(const char* filename, ImageRGB8& image) {
-        int image_width, image_height, image_channels;
-        unsigned char* image_data = stbi_load(filename, &image_width, &image_height, &image_channels, STBI_rgb);
+        struct Image {
+            long image_width;
+            long image_height;
+            int image_channels;
+            unsigned char* image_data;
+        };
 
-        // @TODO: Do a check here to see if the image has indeed been successfully loaded
+        void LoadImage(const char* filename, Image& image) {
+            int image_width, image_height, image_channels;
+            unsigned char* image_data = stbi_load(filename, &image_width, &image_height, &image_channels, STBI_rgb);
 
-        image.image_width = image_width;
-        image.image_height = image_height;
-        image.image_channels = 3;
-        image.image_data = image_data;
-    }
+            // @TODO: Do a check here to see if the image has indeed been successfully loaded
 
-    // @TODO: Add a function to convert grayscale data to its RGB representation
+            image.image_width = image_width;
+            image.image_height = image_height;
+            image.image_channels = 3;
+            image.image_data = image_data;
+        }
 
-    void FreeImageRGB8(ImageRGB8& image) {
-        stbi_image_free(image.image_data);
-    }
+        // @TODO: Add a function to convert grayscale data to its RGB representation
+
+        void FreeImage(Image& image) {
+            stbi_image_free(image.image_data);
+        }
+
+    } // rgb_8
 
 } // pm
 
