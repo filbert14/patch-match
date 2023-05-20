@@ -1,6 +1,9 @@
 #ifndef PM_PM_H
 #define PM_PM_H
 
+#include "SDL2/SDL.h"
+#include <SDL_opengl.h>
+
 namespace pm {
 
     SDL_Window* window = nullptr;
