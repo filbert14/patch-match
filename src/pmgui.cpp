@@ -1,5 +1,6 @@
 #include "imgui_helper.h"
 #include "stb_image_helper.h"
+#include "eigen_helper.h"
 
 int main() {
     pm::Initialize();
@@ -10,7 +11,10 @@ int main() {
 
     // Load JPG image using stb_image
     pm::Image image;
-    pm::LoadImageRGB("image.jpg", image);
+    pm::LoadImageRGB8("image.jpg", image);
+
+    pm::ImageMatrix image_matrix = pm::ImageDataToMatrixRGB8(image);
+    image = pm::ImageMatrixToDataRGB8(image_matrix);
 
     int image_width = image.image_width;
     int image_height = image.image_height;
