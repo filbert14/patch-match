@@ -4,9 +4,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(pm)
 
 add_library(pm STATIC)
-# target_sources(pm PUBLIC src/pm.cpp)
-target_include_directories(pm PUBLIC src)
 target_link_libraries(pm PUBLIC DearImGui)
+target_sources(pm PUBLIC src/pm.cpp src/pm_helper.cpp)
+target_include_directories(pm PUBLIC src)
 
 add_executable(pmgui src/pmgui.cpp)
 target_link_libraries(pmgui PUBLIC pm)

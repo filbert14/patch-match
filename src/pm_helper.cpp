@@ -1,14 +1,25 @@
-#ifndef PM_EIGEN_HELPER_H
-#define PM_EIGEN_HELPER_H
-
-#include <eigen3/Eigen/Core>
-
-#include "stb_image_helper.h"
-#include "pm_types.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "pm_helper.h"
 
 namespace pm {
 
     namespace rgb_8 {
+
+        void LoadImage(const char* filename, Image& image) {
+            int image_width, image_height, image_channels;
+            unsigned char* image_data = stbi_load(filename, &image_width, &image_height, &image_channels, STBI_rgb);
+
+            // @TODO: Do a check here to see if the image has indeed been successfully loaded
+
+            image.image_width = image_width;
+            image.image_height = image_height;
+            image.image_channels = 3;
+            image.image_data = image_data;
+        }
+
+        void FreeImage(Image& image) {
+            stbi_image_free(image.image_data);
+        }
 
         ImageMatrix GetImageMatrix(Image& image) {
             ImageMatrix image_matrix;
@@ -47,5 +58,3 @@ namespace pm {
     } // rgb_8
 
 } // pm
-
-#endif //PM_EIGEN_HELPER_H
