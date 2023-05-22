@@ -6,16 +6,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "pm_types.h"
+
 namespace pm {
 
     namespace rgb_8 {
-
-        struct Image {
-            int image_width;
-            int image_height;
-            int image_channels;
-            unsigned char* image_data;
-        };
 
         void LoadImage(const char* filename, Image& image) {
             int image_width, image_height, image_channels;

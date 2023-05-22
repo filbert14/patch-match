@@ -4,13 +4,11 @@
 #include <eigen3/Eigen/Core>
 
 #include "stb_image_helper.h"
+#include "pm_types.h"
 
 namespace pm {
 
     namespace rgb_8 {
-
-        typedef Eigen::Matrix<unsigned char, 3, 1> Pixel;
-        typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
 
         ImageMatrix GetImageMatrix(Image& image) {
             ImageMatrix image_matrix;
