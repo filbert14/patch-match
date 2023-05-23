@@ -41,13 +41,14 @@ int main() {
     pm::rgb_8::Image cat_image;
     pm::rgb_8::Image sea_image;
 
-    pm::rgb_8::LoadImage("cat.jpg", cat_image);
-    pm::rgb_8::LoadImage("sea.jpg", sea_image);
+    pm::rgb_8::LoadImage("adam.png", cat_image);
+    pm::rgb_8::LoadImage("cat.jpg", sea_image);
 
     pm::rgb_8::ImageMatrix cat_image_matrix = pm::rgb_8::GetImageMatrix(cat_image);
     pm::rgb_8::ImageMatrix sea_image_matrix = pm::rgb_8::GetImageMatrix(sea_image);
 
-    pm::rgb_8::PatchMatch::GetInstance().Initialize(cat_image_matrix, sea_image_matrix, 1);
+    pm::rgb_8::PatchMatch::GetInstance().Initialize(cat_image_matrix, sea_image_matrix, 3);
+    pm::rgb_8::PatchMatch::GetInstance().ApproximateNNF(4, 0.5, 1);
     pm::rgb_8::ImageMatrix reconstructed_cat_image_matrix = pm::rgb_8::PatchMatch::GetInstance().Reconstruct();
     pm::rgb_8::Image reconstructed_cat_image = pm::rgb_8::GetImage(reconstructed_cat_image_matrix);
 

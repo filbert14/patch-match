@@ -41,6 +41,9 @@ namespace pm {
         public:
             float CalculateDistance(Coordinate& a, Coordinate& b);
             void Initialize(ImageMatrix& A, ImageMatrix& B, int patch_radius);
+            void Propagate(Coordinate& a, bool even);
+            void RandomSearch(Coordinate& a, float alpha, size_t iters);
+            void ApproximateNNF(size_t pm_iters, float alpha, size_t search_iters);
             ImageMatrix Reconstruct();
 
         private:
