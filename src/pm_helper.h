@@ -11,7 +11,7 @@ namespace pm {
     namespace rgb_8 {
 
         typedef std::pair<int, int> Range;
-        typedef Eigen::Matrix<unsigned char, 3, 1> Pixel;
+        typedef Eigen::Matrix<int, 3, 1> Pixel;
         typedef Eigen::Vector2i Coordinate;
         typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix, Patch;
 

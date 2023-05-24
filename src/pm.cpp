@@ -60,14 +60,44 @@ namespace pm {
         }
 
         ImageMatrix PatchMatch::Reconstruct() {
-            ImageMatrix A_reconstructed;
-            A_reconstructed.resize(A_.rows(), A_.cols());
+            int l = 2 * patch_radius_ + 1;
+
+            ImageMatrix A_reconstructed_noisy;
+            A_reconstructed_noisy.resize(A_padded_.rows(), A_padded_.cols());
+            A_reconstructed_noisy.fill({0, 0, 0});
+
+            Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> A_reconstructed_count;
+            A_reconstructed_count.resize(A_padded_.rows(), A_padded_.cols());
+            A_reconstructed_count.fill(0);
+
+            Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ones;
+            ones.resize(l, l);
+            ones.fill(1);
+
             for(int i = 0; i < A_.rows(); ++i) {
                 for(int j = 0; j < A_.cols(); ++j) {
-                    A_reconstructed(i,j) = B_(nnf_(i,j)[0], nnf_(i,j)[1]);
+                    int i_b = nnf_(i, j)[0];
+                    i_b = i_b < patch_radius_ ? patch_radius_ : i_b;
+                    i_b = i_b > B_.rows() - patch_radius_ - 1 ? B_.rows() - patch_radius_ - 1 : i_b;
+
+                    int j_b = nnf_(i, j)[1];
+                    j_b = j_b < patch_radius_ ? patch_radius_ : j_b;
+                    j_b = j_b > B_.cols() - patch_radius_ - 1 ? B_.cols() - patch_radius_ - 1 : j_b;
+
+                    Patch at_b = B_.block(i_b - patch_radius_, j_b - patch_radius_, l, l);
+                    A_reconstructed_noisy.block(i, j, l, l) += at_b;
+                    A_reconstructed_count.block(i, j, l, l) += ones;
                 }
             }
-            return A_reconstructed;
+
+            for(int i = 0; i < A_reconstructed_noisy.rows(); ++i) {
+                for(int j = 0; j < A_reconstructed_noisy.cols(); ++j) {
+                    A_reconstructed_noisy(i, j) /= A_reconstructed_count(i, j);
+                }
+            }
+
+            ImageMatrix A_reconstructed_smoothed = A_reconstructed_noisy.block(patch_radius_, patch_radius_, A_.rows(), A_.cols());
+            return A_reconstructed_smoothed;
         }
 
         void PatchMatch::Propagate(Coordinate& a, bool even) {
