@@ -5,7 +5,7 @@ project(pm)
 
 add_library(pm STATIC)
 target_link_libraries(pm PUBLIC DearImGui)
-target_sources(pm PUBLIC src/pm.cpp src/pm_helper.cpp)
+target_sources(pm PUBLIC src/pm.cpp src/pm_helper.cpp src/imgui_helper.cpp)
 target_include_directories(pm PUBLIC src)
 
 add_executable(pmgui src/pmgui.cpp)

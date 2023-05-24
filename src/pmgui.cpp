@@ -1,72 +1,59 @@
 #include "imgui_helper.h"
 #include "pm.h"
 
-GLuint GenerateTexture(int image_width, int image_height, void* image_data) {
-    GLuint texture_id;
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    return texture_id;
-}
-
-// @TODO: Write a function to delete a texture
-
-/* *
-
 int main() {
     pm::Initialize();
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     pm::CreateWindow("pmgui", display_mode.w, display_mode.h);
 
-    bool done = false;
-    while (!done) {
-        pm::HandleEvent(done);
-        pm::NewFrame();
+    // Anne Hathaway
+    pm::rgb_8::Image anne_hathaway;
+    pm::rgb_8::LoadImage("anneh2.jpg", anne_hathaway);
 
-        pm::EndFrame();
-    }
+    pm::rgb_8::ImageMatrix anne_hathaway_matrix = pm::rgb_8::GetImageMatrix(anne_hathaway);
 
-    pm::DestroyWindow();
-    pm::Terminate();
-    return 0;
-}
+    GLuint anne_hathaway_texture_id;
+    pm::GenerateTextureRGB8(&anne_hathaway_texture_id, anne_hathaway.image_width, anne_hathaway.image_height);
+    pm::UpdateTextureRGB8(&anne_hathaway_texture_id, anne_hathaway.image_data, anne_hathaway.image_width, anne_hathaway.image_height);
 
-* */
+    // Mona Lisa
+    pm::rgb_8::Image mona_lisa;
+    pm::rgb_8::LoadImage("monalisa3.jpg", mona_lisa);
 
-int main() {
-    pm::rgb_8::Image cat_image;
-    pm::rgb_8::Image sea_image;
+    pm::rgb_8::ImageMatrix mona_lisa_matrix = pm::rgb_8::GetImageMatrix(mona_lisa);
 
-    pm::rgb_8::LoadImage("adam.png", cat_image);
-    pm::rgb_8::LoadImage("cat.jpg", sea_image);
+    GLuint mona_lisa_texture_id;
+    pm::GenerateTextureRGB8(&mona_lisa_texture_id, mona_lisa.image_width, mona_lisa.image_height);
+    pm::UpdateTextureRGB8(&mona_lisa_texture_id, mona_lisa.image_data, mona_lisa.image_width, mona_lisa.image_height);
 
-    pm::rgb_8::ImageMatrix cat_image_matrix = pm::rgb_8::GetImageMatrix(cat_image);
-    pm::rgb_8::ImageMatrix sea_image_matrix = pm::rgb_8::GetImageMatrix(sea_image);
-
-    pm::rgb_8::PatchMatch::GetInstance().Initialize(cat_image_matrix, sea_image_matrix, 3);
+    // Patch Match Algorithm Instance
+    pm::rgb_8::PatchMatch::GetInstance().Initialize(mona_lisa_matrix, anne_hathaway_matrix, 2);
     pm::rgb_8::PatchMatch::GetInstance().ApproximateNNF(4, 0.5, 1);
-    pm::rgb_8::ImageMatrix reconstructed_cat_image_matrix = pm::rgb_8::PatchMatch::GetInstance().Reconstruct();
-    pm::rgb_8::Image reconstructed_cat_image = pm::rgb_8::GetImage(reconstructed_cat_image_matrix);
 
-    // GUI : START
-    pm::Initialize();
-    SDL_DisplayMode display_mode;
-    SDL_GetCurrentDisplayMode(0, &display_mode);
-    pm::CreateWindow("pmgui", display_mode.w, display_mode.h);
+    // Reconstructed Image
+    pm::rgb_8::ImageMatrix reconstructed_matrix = pm::rgb_8::PatchMatch::GetInstance().Reconstruct();
+    pm::rgb_8::Image reconstructed = pm::rgb_8::GetImage(reconstructed_matrix);
 
-    GLuint texture_id = GenerateTexture(reconstructed_cat_image.image_width, reconstructed_cat_image.image_height, reconstructed_cat_image.image_data);
+    GLuint reconstructed_texture_id;
+    pm::GenerateTextureRGB8(&reconstructed_texture_id, reconstructed.image_width, reconstructed.image_height);
+    pm::UpdateTextureRGB8(&reconstructed_texture_id, reconstructed.image_data, reconstructed.image_width, reconstructed.image_height);
 
     bool done = false;
     while (!done) {
         pm::HandleEvent(done);
         pm::NewFrame();
 
-        ImGui::Begin("reconstructed_cat_image");
-        ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture_id)), ImVec2(reconstructed_cat_image.image_width, reconstructed_cat_image.image_height));
+        ImGui::Begin("anne_hathaway");
+        ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(anne_hathaway_texture_id)), ImVec2(anne_hathaway.image_width, anne_hathaway.image_height));
+        ImGui::End();
+
+        ImGui::Begin("mona_lisa");
+        ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(mona_lisa_texture_id)), ImVec2(mona_lisa.image_width, mona_lisa.image_height));
+        ImGui::End();
+
+        ImGui::Begin("reconstructed");
+        ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(reconstructed_texture_id)), ImVec2(reconstructed.image_width, reconstructed.image_height));
         ImGui::End();
 
         pm::EndFrame();
@@ -74,9 +61,5 @@ int main() {
 
     pm::DestroyWindow();
     pm::Terminate();
-    // GUI : END
-
-    pm::rgb_8::FreeImage(cat_image);
-    pm::rgb_8::FreeImage(sea_image);
     return 0;
 }
