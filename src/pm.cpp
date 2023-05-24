@@ -16,10 +16,11 @@ namespace pm {
             for(int i = 0; i < at_a.rows(); ++i) {
                 for(int j = 0; j < at_a.cols(); ++j) {
                     if(!valid_(a[0] + i, a[1] + j)) { continue; }
-                    float y_at_a = 0.2126 * at_a(i, j)[0] + 0.7152 * at_a(i, j)[1] + 0.0722 * at_a(i, j)[2];
-                    float y_at_b = 0.2126 * at_b(i, j)[0] + 0.7152 * at_b(i, j)[1] + 0.0722 * at_b(i, j)[2];
+                    float ssd_at_ij = std::pow(at_a(i, j)[0] - at_b(i, j)[0], 2) +
+                                      std::pow(at_a(i, j)[1] - at_b(i, j)[1], 2) +
+                                      std::pow(at_a(i, j)[2] - at_b(i, j)[2], 2);
 
-                    mse += (y_at_b - y_at_a) * (y_at_b - y_at_a);
+                    mse += ssd_at_ij;
                     ++count;
                 }
             }
