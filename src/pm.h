@@ -58,6 +58,9 @@ namespace pm {
             int patch_radius_;
 
             RandomCoordinateGenerator rcg_;
+
+        private:
+            Coordinate GetValidPatchCoordinateAtB(Coordinate& b);
         };
 
     } // rgb_8

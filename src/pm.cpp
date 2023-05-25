@@ -59,47 +59,6 @@ namespace pm {
             }
         }
 
-        ImageMatrix PatchMatch::Reconstruct() {
-            int l = 2 * patch_radius_ + 1;
-
-            ImageMatrix A_reconstructed_noisy;
-            A_reconstructed_noisy.resize(A_padded_.rows(), A_padded_.cols());
-            A_reconstructed_noisy.fill({0, 0, 0});
-
-            Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> A_reconstructed_count;
-            A_reconstructed_count.resize(A_padded_.rows(), A_padded_.cols());
-            A_reconstructed_count.fill(0);
-
-            Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ones;
-            ones.resize(l, l);
-            ones.fill(1);
-
-            for(int i = 0; i < A_.rows(); ++i) {
-                for(int j = 0; j < A_.cols(); ++j) {
-                    int i_b = nnf_(i, j)[0];
-                    i_b = i_b < patch_radius_ ? patch_radius_ : i_b;
-                    i_b = i_b > B_.rows() - patch_radius_ - 1 ? B_.rows() - patch_radius_ - 1 : i_b;
-
-                    int j_b = nnf_(i, j)[1];
-                    j_b = j_b < patch_radius_ ? patch_radius_ : j_b;
-                    j_b = j_b > B_.cols() - patch_radius_ - 1 ? B_.cols() - patch_radius_ - 1 : j_b;
-
-                    Patch at_b = B_.block(i_b - patch_radius_, j_b - patch_radius_, l, l);
-                    A_reconstructed_noisy.block(i, j, l, l) += at_b;
-                    A_reconstructed_count.block(i, j, l, l) += ones;
-                }
-            }
-
-            for(int i = 0; i < A_reconstructed_noisy.rows(); ++i) {
-                for(int j = 0; j < A_reconstructed_noisy.cols(); ++j) {
-                    A_reconstructed_noisy(i, j) /= A_reconstructed_count(i, j);
-                }
-            }
-
-            ImageMatrix A_reconstructed_smoothed = A_reconstructed_noisy.block(patch_radius_, patch_radius_, A_.rows(), A_.cols());
-            return A_reconstructed_smoothed;
-        }
-
         void PatchMatch::Propagate(Coordinate& a, bool even) {
             int i = a[0];
             int j = a[1];
@@ -108,19 +67,29 @@ namespace pm {
                 Coordinate right = {i, j == A_.cols() - 1 ? A_.cols() - 1 : j + 1};
                 Coordinate down = {i == A_.rows() - 1 ? A_.rows() - 1 : i + 1, j};
 
+                Coordinate b_right = nnf_(right[0], right[1]);
+                b_right = GetValidPatchCoordinateAtB(b_right);
+
+                Coordinate b_down = nnf_(down[0], down[1]);
+                b_down = GetValidPatchCoordinateAtB(b_down);
+
                 float distance_current = distance_(i, j);
-                float distance_right = distance_(right[0], right[1]);
-                float distance_down = distance_(down[0], down[1]);
+                float distance_right = CalculateDistance(a, b_right);
+                float distance_down = CalculateDistance(a, b_down);
 
                 std::vector<float> d = {distance_current, distance_right, distance_down};
                 int v = std::distance(std::begin(d), std::min_element(std::begin(d), std::end(d)));
 
                 if(v == 1) {
-                    nnf_(i, j) = nnf_(right[0], right[1]);
-                    distance_(i, j) = CalculateDistance(a, nnf_(i, j));
+                    Coordinate b_left = {b_right[0], b_right[1] - 1};
+                    b_left = GetValidPatchCoordinateAtB(b_left);
+                    nnf_(i, j) = b_left;
+                    distance_(i, j) = CalculateDistance(a, b_left);
                 } else if(v == 2) {
-                    nnf_(i, j) = nnf_(down[0], down[1]);
-                    distance_(i, j) = CalculateDistance(a, nnf_(i,j));
+                    Coordinate b_up = {b_down[0] - 1, b_down[1]};
+                    b_up = GetValidPatchCoordinateAtB(b_up);
+                    nnf_(i, j) = b_up;
+                    distance_(i, j) = CalculateDistance(a, b_up);
                 }
             }
 
@@ -128,19 +97,29 @@ namespace pm {
                 Coordinate left = {i, j == 0 ? 0 : j - 1};
                 Coordinate up = {i == 0 ? 0 : i - 1, j};
 
+                Coordinate b_left = nnf_(left[0], left[1]);
+                b_left = GetValidPatchCoordinateAtB(b_left);
+
+                Coordinate b_up = nnf_(up[0], up[1]);
+                b_up = GetValidPatchCoordinateAtB(b_up);
+
                 float distance_current = distance_(i, j);
-                float distance_left = distance_(left[0], left[1]);
-                float distance_up = distance_(up[0], up[1]);
+                float distance_left = CalculateDistance(a, b_left);
+                float distance_up = CalculateDistance(a, b_up);
 
                 std::vector<float> d = {distance_current, distance_left, distance_up};
                 int v = std::distance(std::begin(d), std::min_element(std::begin(d), std::end(d)));
 
                 if(v == 1) {
-                    nnf_(i, j) = nnf_(left[0], left[1]);
-                    distance_(i, j) = CalculateDistance(a, nnf_(i, j));
+                    Coordinate b_right = Coordinate {b_left[0], b_left[1] + 1};
+                    b_right = GetValidPatchCoordinateAtB(b_right);
+                    nnf_(i, j) = b_right;
+                    distance_(i, j) = CalculateDistance(a, b_right);
                 } else if(v == 2) {
-                    nnf_(i, j) = nnf_(up[0], up[1]);
-                    distance_(i, j) = CalculateDistance(a, nnf_(i, j));
+                    Coordinate b_down = Coordinate {b_up[0] + 1, b_up[1]};
+                    b_down = GetValidPatchCoordinateAtB(b_down);
+                    nnf_(i, j) = b_down;
+                    distance_(i, j) = CalculateDistance(a, b_down);
                 }
             }
         }
@@ -196,6 +175,59 @@ namespace pm {
                     }
                 }
             }
+        }
+
+        ImageMatrix PatchMatch::Reconstruct() {
+            int l = 2 * patch_radius_ + 1;
+
+            ImageMatrix A_reconstructed_noisy;
+            A_reconstructed_noisy.resize(A_padded_.rows(), A_padded_.cols());
+            A_reconstructed_noisy.fill({0, 0, 0});
+
+            Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> A_reconstructed_count;
+            A_reconstructed_count.resize(A_padded_.rows(), A_padded_.cols());
+            A_reconstructed_count.fill(0);
+
+            Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ones;
+            ones.resize(l, l);
+            ones.fill(1);
+
+            for(int i = 0; i < A_.rows(); ++i) {
+                for(int j = 0; j < A_.cols(); ++j) {
+                    int i_b = nnf_(i, j)[0];
+                    i_b = i_b < patch_radius_ ? patch_radius_ : i_b;
+                    i_b = i_b > B_.rows() - patch_radius_ - 1 ? B_.rows() - patch_radius_ - 1 : i_b;
+
+                    int j_b = nnf_(i, j)[1];
+                    j_b = j_b < patch_radius_ ? patch_radius_ : j_b;
+                    j_b = j_b > B_.cols() - patch_radius_ - 1 ? B_.cols() - patch_radius_ - 1 : j_b;
+
+                    Patch at_b = B_.block(i_b - patch_radius_, j_b - patch_radius_, l, l);
+                    A_reconstructed_noisy.block(i, j, l, l) += at_b;
+                    A_reconstructed_count.block(i, j, l, l) += ones;
+                }
+            }
+
+            for(int i = 0; i < A_reconstructed_noisy.rows(); ++i) {
+                for(int j = 0; j < A_reconstructed_noisy.cols(); ++j) {
+                    A_reconstructed_noisy(i, j) /= A_reconstructed_count(i, j);
+                }
+            }
+
+            ImageMatrix A_reconstructed_smoothed = A_reconstructed_noisy.block(patch_radius_, patch_radius_, A_.rows(), A_.cols());
+            return A_reconstructed_smoothed;
+        }
+
+        Coordinate PatchMatch::GetValidPatchCoordinateAtB(Coordinate& b) {
+            int i = b[0];
+            i = i < patch_radius_ ? patch_radius_ : i;
+            i = i > B_.rows() - patch_radius_ - 1 ? B_.rows() - patch_radius_ - 1 : i;
+
+            int j = b[1];
+            j = j < patch_radius_ ? patch_radius_ : j;
+            j = j > B_.cols() - patch_radius_ - 1 ? B_.cols() - patch_radius_ - 1 : j;
+
+            return Coordinate {i, j};
         }
 
     } // rgb_8
