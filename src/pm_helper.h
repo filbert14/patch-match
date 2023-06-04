@@ -11,7 +11,6 @@ namespace pm {
     typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
 
     cv::Mat LoadImage(const char* image);
-
     ImageMatrix ConvMat2Matrix(const cv::Mat& image_mat);
     cv::Mat ConvMatrix2Mat(const ImageMatrix& image_matrix);
 
