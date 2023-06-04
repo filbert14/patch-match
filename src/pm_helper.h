@@ -1,34 +1,22 @@
 #ifndef PM_PM_HELPER_H
 #define PM_PM_HELPER_H
 
-#include <string>
-
-#include "stb_image.h"
+#include <opencv2/opencv.hpp>
 #include <eigen3/Eigen/Core>
 
 namespace pm {
 
-    namespace rgb_8 {
+    // Type definitions
+    typedef std::pair<int, int> Range;
+    typedef Eigen::Vector3i Pixel;
+    typedef Eigen::Vector2i Coordinate;
+    typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
+    typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> Patch;
 
-        typedef std::pair<int, int> Range;
-        typedef Eigen::Matrix<int, 3, 1> Pixel;
-        typedef Eigen::Vector2i Coordinate;
-        typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix, Patch;
-
-        struct Image {
-            int image_width;
-            int image_height;
-            int image_channels;
-            unsigned char* image_data;
-        };
-
-        void LoadImage(const char* filename, Image& image);
-        void FreeImage(Image& image);
-
-        ImageMatrix GetImageMatrix(Image& image);
-        Image GetImage(ImageMatrix& image_matrix);
-
-    } // rgb_8
+    // Helper functions
+    cv::Mat LoadImage(const char* image);
+    ImageMatrix ConvMat2Matrix(const cv::Mat& image_mat);
+    cv::Mat ConvMatrix2Mat(const ImageMatrix& image_matrix);
 
 } // pm
 
