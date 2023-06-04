@@ -7,8 +7,8 @@ add_library(pm STATIC)
 target_sources(pm PUBLIC src/pm.cpp src/pm_helper.cpp)
 target_include_directories(pm PUBLIC src)
 
-add_executable(patchmatch src/main.cpp)
-target_link_libraries(patchmatch PUBLIC pm)
+add_executable(main src/main.cpp)
+target_link_libraries(main PUBLIC pm)
 
 ### Eigen
 find_package(Eigen3 REQUIRED)
