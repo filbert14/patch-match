@@ -1,14 +1,9 @@
 #include "pm.h"
 #include "pm_helper.h"
 
-int main() {
-    std::string A;
-    std::cout << "Enter target image file: ";
-    std::getline(std::cin, A);
-
-    std::string B;
-    std::cout << "Enter reference image file: ";
-    std::getline(std::cin, B);
+int main(int, char** argv) {
+    std::string A = std::string(argv[1]);
+    std::string B = std::string(argv[2]);
 
     cv::Mat A_mat = pm::LoadImage(A.c_str());
     cv::Mat B_mat = pm::LoadImage(B.c_str());
