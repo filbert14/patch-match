@@ -34,6 +34,10 @@ int main(int, char** argv) {
 
         cv::imshow("A_reconstructed", A_reconstructed_mat);
         cv::waitKey(0);
+
+        if(cv::getWindowProperty("A_reconstructed", cv::WND_PROP_AUTOSIZE) == -1) {
+            return 0;
+        }
     }
 
     return 0;
