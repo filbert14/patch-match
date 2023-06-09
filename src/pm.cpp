@@ -117,23 +117,21 @@ namespace pm {
         }
     }
 
-    void PatchMatch::ApproximateNNF(size_t pm_iters, float alpha, size_t search_iters) {
-        for(int t = 0; t < pm_iters; ++t) {
-            if(t % 2 == 0) {
-                for(int i = 0; i < A_.rows(); ++i) {
-                    for(int j = 0; j < A_.cols(); ++j) {
-                        Coordinate a {i, j};
-                        Propagate(a, true);
-                        RandomSearch(a, alpha, search_iters);
-                    }
+    void PatchMatch::Iterate(bool even, float alpha, size_t search_iters) {
+        if(even) {
+            for(int i = 0; i < A_.rows(); ++i) {
+                for(int j = 0; j < A_.cols(); ++j) {
+                    Coordinate a {i, j};
+                    Propagate(a, true);
+                    RandomSearch(a, alpha, search_iters);
                 }
-            } else {
-                for(int i = A_.rows() - 1; i > -1; --i) {
-                    for(int j = A_.cols() - 1; j > -1; --j) {
-                        Coordinate a {i, j};
-                        Propagate(a, false);
-                        RandomSearch(a, alpha, search_iters);
-                    }
+            }
+        } else {
+            for(int i = A_.rows() - 1; i > -1; --i) {
+                for(int j = A_.cols() - 1; j > -1; --j) {
+                    Coordinate a {i, j};
+                    Propagate(a, false);
+                    RandomSearch(a, alpha, search_iters);
                 }
             }
         }

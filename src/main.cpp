@@ -12,7 +12,10 @@ int main(int, char** argv) {
     pm::ImageMatrix B_matrix = pm::ConvMat2Matrix(B_mat);
 
     pm::PatchMatch::GetInstance().Initialize(A_matrix, B_matrix, 1);
-    pm::PatchMatch::GetInstance().ApproximateNNF(4, 0.5, 1);
+
+    for(int t = 0; t < 4; ++t) {
+        pm::PatchMatch::GetInstance().Iterate(t % 2 == 0, 0.5, 1);
+    }
 
     pm::ImageMatrix A_reconstructed_matrix = pm::PatchMatch::GetInstance().Reconstruct();
     cv::Mat A_reconstructed_mat = pm::ConvMatrix2Mat(A_reconstructed_matrix);

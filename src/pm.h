@@ -47,7 +47,7 @@ namespace pm {
         void RandomSearch(Coordinate& a, float alpha, size_t search_iters);
 
     public:
-        void ApproximateNNF(size_t pm_iters, float alpha, size_t search_iters);
+        void Iterate(bool even, float alpha, size_t search_iters);
         float CalculateDistance(Coordinate& a, Coordinate& b);
         ImageMatrix Reconstruct();
 
