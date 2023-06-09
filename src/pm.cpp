@@ -2,7 +2,7 @@
 
 namespace pm {
 
-    void PatchMatch::Initialize(ImageMatrix& A, ImageMatrix& B, int patch_radius) {
+    void PatchMatch::Initialize(ImageMatrix& A, ImageMatrix& B, size_t patch_radius) {
         A_ = A;
         B_ = B;
         patch_radius_ = patch_radius;

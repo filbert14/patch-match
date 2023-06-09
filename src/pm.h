@@ -42,7 +42,7 @@ namespace pm {
 
     // Core algorithm
     public:
-        void Initialize(ImageMatrix& A, ImageMatrix& B, int patch_radius);
+        void Initialize(ImageMatrix& A, ImageMatrix& B, size_t patch_radius);
         void Propagate(Coordinate& a, bool even);
         void RandomSearch(Coordinate& a, float alpha, size_t search_iters);
 
