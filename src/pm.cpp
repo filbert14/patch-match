@@ -137,6 +137,12 @@ namespace pm {
         }
     }
 
+    void PatchMatch::ApproximateNNF(size_t pm_iters, float alpha, size_t search_iters) {
+        for(int t = 0; t < pm_iters; ++t) {
+            pm::PatchMatch::GetInstance().Iterate(t % 2 == 0, alpha, search_iters);
+        }
+    }
+
     float PatchMatch::CalculateDistance(Coordinate& a, Coordinate& b) {
         int l = 2 * patch_radius_ + 1;
 
@@ -163,16 +169,26 @@ namespace pm {
         return mse;
     }
 
-    ImageMatrix PatchMatch::Reconstruct() {
+    ImageMatrix PatchMatch::PatchUp(PatchMap& patch_map) {
         int l = 2 * patch_radius_ + 1;
 
-        ImageMatrix A_reconstructed_noisy;
-        A_reconstructed_noisy.resize(A_padded_.rows(), A_padded_.cols());
-        A_reconstructed_noisy.fill({0, 0, 0});
+        ImageMatrix A_patched_padded = A_padded_;
 
-        Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> A_reconstructed_count;
-        A_reconstructed_count.resize(A_padded_.rows(), A_padded_.cols());
-        A_reconstructed_count.fill(0);
+        Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> empties;
+        empties.resize(l, l);
+        empties.fill({0, 0, 0});
+
+        for(int i = 0; i < A_.rows(); ++i) {
+            for(int j = 0; j < A_.cols(); ++j) {
+                if(patch_map(i, j)) {
+                    A_patched_padded.block(i, j, l, l) = empties;
+                }
+            }
+        }
+
+        Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> A_patched_count;
+        A_patched_count.resize(A_padded_.rows(), A_padded_.cols());
+        A_patched_count.fill(0);
 
         Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ones;
         ones.resize(l, l);
@@ -180,22 +196,24 @@ namespace pm {
 
         for(int i = 0; i < A_.rows(); ++i) {
             for(int j = 0; j < A_.cols(); ++j) {
+                if(!patch_map(i, j)) { continue; }
                 int i_b = nnf_(i, j)[0];
                 int j_b = nnf_(i, j)[1];
                 Patch at_b = B_.block(i_b - patch_radius_, j_b - patch_radius_, l, l);
-                A_reconstructed_noisy.block(i, j, l, l) += at_b;
-                A_reconstructed_count.block(i, j, l, l) += ones;
+                A_patched_padded.block(i, j, l, l) += at_b;
+                A_patched_count.block(i, j, l, l) += ones;
             }
         }
 
-        for(int i = 0; i < A_reconstructed_noisy.rows(); ++i) {
-            for(int j = 0; j < A_reconstructed_noisy.cols(); ++j) {
-                A_reconstructed_noisy(i, j) /= A_reconstructed_count(i, j);
+        for(int i = 0; i < A_patched_padded.rows(); ++i) {
+            for(int j = 0; j < A_patched_padded.cols(); ++j) {
+                if(A_patched_count(i, j) == 0) { continue; }
+                A_patched_padded(i, j) /= A_patched_count(i, j);
             }
         }
 
-        ImageMatrix A_reconstructed_smoothed = A_reconstructed_noisy.block(patch_radius_, patch_radius_, A_.rows(), A_.cols());
-        return A_reconstructed_smoothed;
+        ImageMatrix A_patched = A_patched_padded.block(patch_radius_, patch_radius_, A_.rows(), A_.cols());
+        return A_patched;
     }
 
 } // pm

@@ -12,6 +12,7 @@ namespace pm {
     typedef Eigen::Vector2i Coordinate;
     typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> ImageMatrix;
     typedef Eigen::Matrix<Pixel, Eigen::Dynamic, Eigen::Dynamic> Patch;
+    typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> PatchMap;
 
     // Helper functions
     cv::Mat LoadImage(const char* image);

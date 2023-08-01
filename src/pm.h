@@ -7,6 +7,12 @@
 
 namespace pm {
 
+    // Default parameters for PatchMatch
+    const int    PM_ITERS = 5;
+    const size_t PATCH_RADIUS = 1;
+    const float  ALPHA = 0.5f;
+    const size_t SEARCH_ITERS = 1;
+
     // RandomCoordinateGenerator
     // Generates a random coordinate within a given range
     // using a Mersenne Twister pseudo-random generator
@@ -42,14 +48,19 @@ namespace pm {
 
     // Core algorithm
     public:
-        void Initialize(ImageMatrix& A, ImageMatrix& B, size_t patch_radius);
+        void Initialize(ImageMatrix& A, ImageMatrix& B, size_t patch_radius = PATCH_RADIUS);
         void Propagate(Coordinate& a, bool even);
-        void RandomSearch(Coordinate& a, float alpha, size_t search_iters);
+        void RandomSearch(Coordinate& a, float alpha = ALPHA, size_t search_iters = SEARCH_ITERS);
 
+    // Helper functions
     public:
-        void Iterate(bool even, float alpha, size_t search_iters);
+        void Iterate(bool even, float alpha = ALPHA, size_t search_iters = SEARCH_ITERS);
+        void ApproximateNNF(size_t pm_iters = PM_ITERS, float alpha = ALPHA, size_t search_iters = SEARCH_ITERS);
         float CalculateDistance(Coordinate& a, Coordinate& b);
-        ImageMatrix Reconstruct();
+
+    // Miscellaneous functions
+    public:
+        ImageMatrix PatchUp(PatchMap& patch_map);
 
     // Internal data structures
     private:
