@@ -7,6 +7,8 @@
  * Visualizes step by step reconstruction
  * of image_A using patches from image_B
  *
+ * Press any button repeatedly to cycle through intermediate results!
+ *
  * filbert14
  */
 

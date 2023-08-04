@@ -8,6 +8,8 @@
  * coarse-to-fine gradual resizing,
  * sped up by PatchMatch
  *
+ * Press any button repeatedly to cycle through intermediate results!
+ *
  * filbert14
  */
 
