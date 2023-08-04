@@ -1,4 +1,4 @@
-# pm
+# patch-match
 
 ![image](https://github.com/filbert14/pm/assets/115785598/1fa3e47c-0c14-4b9c-acb8-7879f365411f)
 
