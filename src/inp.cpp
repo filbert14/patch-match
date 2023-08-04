@@ -2,12 +2,12 @@
 
 namespace inp {
 
-    void Inpainting::Initialize(ImageMatrix& A, ImageMatrix& A_masked) {
+    void Inpainting::Initialize(ImageMatrix& A, ImageMatrix& A_mask) {
         A_ = A;
         A_pyramid_ = ConstructPyramid(A_);
 
-        A_masked_ = A_masked;
-        A_masked_pyramid_ = ConstructPyramid(A_masked_);
+        A_mask_ = A_mask;
+        A_mask_pyramid_ = ConstructPyramid(A_mask_);
     }
 
     std::vector<ImageMatrix> Inpainting::ConstructPyramid(ImageMatrix& I) {
@@ -33,28 +33,28 @@ namespace inp {
         return I_pyramid;
     }
 
-    ImageMatrix Inpainting::ThresholdMaskedImage(ImageMatrix& I, Pixel lower_range, Pixel upper_range) {
-        cv::Mat I_rgb = ConvMatrix2Mat(I);
-        cv::Mat I_hsv; cv::cvtColor(I_rgb, I_hsv, cv::COLOR_RGB2HSV);
+    ImageMatrix Inpainting::ThresholdImageMask(ImageMatrix& I_mask, Pixel lower_range, Pixel upper_range) {
+        cv::Mat I_mask_rgb = ConvMatrix2Mat(I_mask);
+        cv::Mat I_mask_hsv; cv::cvtColor(I_mask_rgb, I_mask_hsv, cv::COLOR_RGB2HSV);
 
         cv::Scalar l {(double) lower_range(0), (double) lower_range(1), (double) lower_range(2)};
         cv::Scalar u {(double) upper_range(0), (double) upper_range(1), (double) upper_range(2)};
-        cv::Mat mask; cv::inRange(I_hsv, l, u, mask);
+        cv::Mat mask; cv::inRange(I_mask_hsv, l, u, mask);
 
-        cv::Mat I_thresholded; cv::bitwise_and(I_rgb, I_rgb, I_thresholded, mask);
-        ImageMatrix I_thresholded_matrix = ConvMat2Matrix(I_thresholded);
+        cv::Mat I_mask_thresholded; cv::bitwise_and(I_mask_rgb, I_mask_rgb, I_mask_thresholded, mask);
+        ImageMatrix I_mask_thresholded_matrix = ConvMat2Matrix(I_mask_thresholded);
 
-        return I_thresholded_matrix;
+        return I_mask_thresholded_matrix;
     }
 
-    PatchMap Inpainting::GetPatchMap(ImageMatrix& I_masked) {
+    PatchMap Inpainting::GetPatchMap(ImageMatrix& I_mask) {
         PatchMap patch_map;
-        patch_map.resize(I_masked.rows(), I_masked.cols());
+        patch_map.resize(I_mask.rows(), I_mask.cols());
         patch_map.fill(false);
 
-        for(int i = 0; i < I_masked.rows(); ++i) {
-            for(int j = 0; j < I_masked.cols(); ++j) {
-                if(I_masked(i, j) != Pixel {0, 0, 0}) {
+        for(int i = 0; i < I_mask.rows(); ++i) {
+            for(int j = 0; j < I_mask.cols(); ++j) {
+                if(I_mask(i, j) != Pixel {0, 0, 0}) {
                     patch_map(i, j) = true;
                 }
             }
@@ -66,10 +66,10 @@ namespace inp {
     std::vector<ImageMatrix> Inpainting::Inpaint() {
         for(int level = 0; level < A_pyramid_.size(); ++level) {
             ImageMatrix& A = A_pyramid_[level];
-            ImageMatrix& A_masked = A_masked_pyramid_[level];
+            ImageMatrix& A_mask = A_mask_pyramid_[level];
 
-            ImageMatrix A_masked_thresholded = ThresholdMaskedImage(A_masked);
-            PatchMap patch_map = GetPatchMap(A_masked_thresholded);
+            ImageMatrix A_mask_thresholded = ThresholdImageMask(A_mask);
+            PatchMap patch_map = GetPatchMap(A_mask_thresholded);
 
             ImageMatrix B = A;
             for(int i = 0; i < B.rows(); ++i) {
