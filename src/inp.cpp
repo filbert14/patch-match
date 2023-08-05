@@ -19,11 +19,9 @@ namespace inp {
         int min_dim = std::min(I.rows(), I.cols());
         while(min_dim > l) {
             ImageMatrix& I_current = I_pyramid.back();
-            cv::Mat I_current_mat = ConvMatrix2Mat(I_current);
-
-            cv::pyrDown(I_current_mat, I_current_mat, {I_current_mat.cols / 2, I_current_mat.rows / 2});
-            I_pyramid.push_back(ConvMat2Matrix(I_current_mat));
-
+            cv::Mat I_downsampled_mat = ConvMatrix2Mat(I_current);
+            cv::resize(I_downsampled_mat, I_downsampled_mat, cv::Size(), 0.5f, 0.5f, cv::INTER_NEAREST);
+            I_pyramid.push_back(ConvMat2Matrix(I_downsampled_mat));
             min_dim = std::min(I_pyramid.back().rows(), I_pyramid.back().cols());
         }
 

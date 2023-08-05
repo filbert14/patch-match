@@ -11,7 +11,7 @@ namespace inp {
 
     // Default hole color
     // https://stackoverflow.com/questions/22588146/tracking-white-color-using-python-opencv
-    const int SENSITIVITY = 15;
+    const int SENSITIVITY = 180;
     const Pixel WHITE_HSV_LOWER_RANGE = {0, 0, 255 - SENSITIVITY};
     const Pixel WHITE_HSV_UPPER_RANGE = {255, SENSITIVITY, 255};
 
